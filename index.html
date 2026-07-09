@@ -12,7 +12,7 @@
     </table>
 
     <script>
-        // Ez a TE publikált CSV linked
+        // Ügyelj rá, hogy a linked végén output=csv legyen
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStI14U-qxq-UOxJrr-9Li2Sqh53RC00Dvw3PvLt12Bz3nzXTepuRKtHMFya3B5X4OpLfHScQqJOrnl/pub?gid=0&single=true&output=csv';
 
         fetch(csvUrl)
@@ -21,20 +21,17 @@
                 const tbody = document.getElementById('tbody');
                 const rows = data.split('\n');
                 
-                if (rows.length > 1) {
-                    for (let i = 1; i < rows.length; i++) {
-                        if (rows[i].trim() === '') continue;
-                        const cols = rows[i].split(',');
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `<td>${cols[0]}</td><td>${cols[1]}</td>`;
-                        tbody.appendChild(tr);
-                    }
-                } else {
-                    document.body.innerHTML += "<p>Hiba: Nem érkezett adat a táblázatból.</p>";
+                for (let i = 1; i < rows.length; i++) {
+                    if (rows[i].trim() === '') continue;
+                    
+                    // Javított elválasztás: figyeljük az idézőjeleket
+                    const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    
+                    const tr = document.createElement('tr');
+                    // A 0. oszlop a dátum, a 2. az Inflacio_Szazalek (vagy amiben a tiszta szám van)
+                    tr.innerHTML = `<td>${cols[0].replace(/"/g, '')}</td><td>${cols[1].replace(/"/g, '')}</td>`;
+                    tbody.appendChild(tr);
                 }
-            })
-            .catch(err => {
-                document.body.innerHTML += "<p>Hiba a betöltéskor: " + err + "</p>";
             });
     </script>
 </body>
