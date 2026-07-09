@@ -3,44 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>Inflációkövető</title>
-    <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; }
-        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: inline-block; }
-        h1 { color: #333; }
-        .data { font-size: 48px; color: #e74c3c; font-weight: bold; }
-    </style>
 </head>
 <body>
-
-    <div class="card">
-        <h1>Aktuális Infláció</h1>
-        <div class="data" id="inflacio">Betöltés...</div>
-        <p>A legfrissebb KSH adat alapján.</p>
-    </div>
+    <h1>Inflációs Adatok</h1>
+    <table id="tabla" border="1">
+        <thead><tr><th>Dátum</th><th>Infláció (%)</th></tr></thead>
+        <tbody id="tbody"></tbody>
+    </table>
 
     <script>
-        // A publikált CSV link
+        // Ez a TE publikált CSV linked
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStI14U-qxq-UOxJrr-9Li2Sqh53RC00Dvw3PvLt12Bz3nzXTepuRKtHMFya3B5X4OpLfHScQqJOrnl/pub?gid=0&single=true&output=csv';
 
         fetch(csvUrl)
             .then(response => response.text())
             .then(data => {
-                const rows = data.split('\n').filter(row => row.trim() !== '');
-                // Az utolsó sort vesszük (ez a legfrissebb adat)
-                const lastRow = rows[rows.length - 1]; 
-                const columns = lastRow.split(',');
+                const tbody = document.getElementById('tbody');
+                const rows = data.split('\n');
                 
-                // Mivel a CSV-ben a második oszlopban van az adat, columns[1]-et használunk
-                const text = columns[1]; 
-                
-                // A regex megkeresi az első számot, ami tizedesvesszőt vagy pontot tartalmaz
-                const match = text.match(/(\d+[.,]\d+)/);
-                
-                // Ha talált számot, kiírja, ha nem, hibaüzenetet küld
-                document.getElementById('inflacio').innerText = match ? match[0].replace(',', '.') + '%' : "Nincs adat";
+                if (rows.length > 1) {
+                    for (let i = 1; i < rows.length; i++) {
+                        if (rows[i].trim() === '') continue;
+                        const cols = rows[i].split(',');
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${cols[0]}</td><td>${cols[1]}</td>`;
+                        tbody.appendChild(tr);
+                    }
+                } else {
+                    document.body.innerHTML += "<p>Hiba: Nem érkezett adat a táblázatból.</p>";
+                }
             })
             .catch(err => {
-                document.getElementById('inflacio').innerText = "Hiba :(";
+                document.body.innerHTML += "<p>Hiba a betöltéskor: " + err + "</p>";
             });
     </script>
 </body>
