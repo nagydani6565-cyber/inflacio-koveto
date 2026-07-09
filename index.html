@@ -2,33 +2,27 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>Infláció - Mit érez a pénztárcád?</title>
+    <title>Infláció Érzékelő</title>
     <style>
-        /* A szép, modern oldal stílusa */
-        body { font-family: 'Helvetica', sans-serif; background: #fafafa; color: #333; line-height: 1.8; padding: 40px; }
-        .container { max-width: 700px; margin: auto; }
-        header { border-bottom: 3px solid #333; margin-bottom: 30px; }
-        h1 { font-size: 32px; }
-        .szoveg { font-size: 18px; margin-bottom: 20px; }
-        
-        /* A csúnya adatdoboz */
-        #adat { font-family: monospace; background: #eee; border: 1px solid #ccc; padding: 5px; font-size: 12px; color: #555; display: inline-block; }
+        body { font-family: 'Segoe UI', sans-serif; background: #fafafa; color: #333; line-height: 1.6; padding: 40px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2d3436; }
+        .adat-doboz { background: #f8f9fa; border-left: 5px solid #ff4757; padding: 20px; margin: 20px 0; }
+        .szam { font-size: 32px; font-weight: bold; color: #ff4757; }
+        .datum { color: #636e72; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Inflációs körkép fiataloknak</h1>
-        </header>
+        <h1>Inflációs körkép</h1>
+        <p>Így alakultak az árak mostanában. A KSH legfrissebb adata alapján:</p>
+        
+        <div class="adat-doboz">
+            <div class="datum" id="datum-kiiras">Dátum betöltése...</div>
+            <div class="szam" id="adat-kiiras">--%</div>
+        </div>
 
-        <section class="szoveg">
-            <p>Sokan kérdezik, miért fogy el a fizetésünk gyorsabban, mint tavaly. A hivatalos számok néha szárazak, de a valóság az, hogy a hétköznapi dolgok drágulása drasztikus.</p>
-            <p>Itt az aktuális adat, ami a KSH-ból jön:</p>
-            
-            <div id="adat">Betöltés...</div>
-            
-            <p>Ez a szám mutatja, hogy mennyivel kerül többe ugyanaz a kosár, mint egy éve.</p>
-        </section>
+        <p>Ez a szám az inflációt mutatja. Szerinted reális? Figyeljük közösen, hogyan változik hónapról hónapra.</p>
     </div>
 
     <script>
@@ -38,11 +32,11 @@
             .then(res => res.text())
             .then(data => {
                 const lines = data.trim().split("\n");
-                // Mivel a táblázatodban a második sorban (index 1) van az adat, és az első oszlopban (index 0) a dátum, 
-                // a második oszlop (index 1) a százalék:
                 const lastLine = lines[lines.length - 1];
                 const cells = lastLine.split(",");
-                document.getElementById('adat').innerText = cells[1] + "%";
+                // cells[0] a dátum, cells[1] az infláció
+                document.getElementById('datum-kiiras').innerText = "Frissítve: " + cells[0];
+                document.getElementById('adat-kiiras').innerText = cells[1] + "%";
             });
     </script>
 </body>
