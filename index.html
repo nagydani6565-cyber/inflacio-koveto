@@ -2,36 +2,22 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>Inflációkövető</title>
+    <title>Infláció Érzékelő</title>
 </head>
 <body>
-    <h1>Inflációs Adatok</h1>
-    <table id="tabla" border="1">
-        <thead><tr><th>Dátum</th><th>Infláció (%)</th></tr></thead>
-        <tbody id="tbody"></tbody>
-    </table>
+    <h1>Aktuális infláció</h1>
+    <div id="adat">Betöltés...</div>
 
     <script>
-        // Ügyelj rá, hogy a linked végén output=csv legyen
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vStI14U-qxq-UOxJrr-9Li2Sqh53RC00Dvw3PvLt12Bz3nzXTepuRKtHMFya3B5X4OpLfHScQqJOrnl/pub?gid=0&single=true&output=csv';
+        // Ide írd a Published to web CSV linket:
+        const csvUrl = "IDE_TEDD_A_PUBLISH_LINKET";
 
         fetch(csvUrl)
-            .then(response => response.text())
+            .then(res => res.text())
             .then(data => {
-                const tbody = document.getElementById('tbody');
-                const rows = data.split('\n');
-                
-                for (let i = 1; i < rows.length; i++) {
-                    if (rows[i].trim() === '') continue;
-                    
-                    // Javított elválasztás: figyeljük az idézőjeleket
-                    const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    
-                    const tr = document.createElement('tr');
-                    // A 0. oszlop a dátum, a 2. az Inflacio_Szazalek (vagy amiben a tiszta szám van)
-                    tr.innerHTML = `<td>${cols[0].replace(/"/g, '')}</td><td>${cols[1].replace(/"/g, '')}</td>`;
-                    tbody.appendChild(tr);
-                }
+                const rows = data.split("\n");
+                const latest = rows[rows.length - 1].split(","); // Az utolsó sor
+                document.getElementById('adat').innerText = "Az infláció: " + latest[1] + "%";
             });
     </script>
 </body>
