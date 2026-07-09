@@ -2,17 +2,18 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>Infláció Érzékelő</title>
+    <title>Infláció</title>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
-        .number { font-size: 48px; font-weight: bold; color: #ff4757; margin: 20px 0; }
+        body { font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; background: #f0f2f5; }
+        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); text-align: center; }
+        h1 { font-size: 20px; color: #555; }
+        #adat { font-size: 60px; font-weight: bold; color: #ff4757; }
     </style>
 </head>
 <body>
     <div class="card">
         <h1>Aktuális infláció</h1>
-        <div id="adat" class="number">Betöltés...</div>
+        <div id="adat">Betöltés...</div>
     </div>
 
     <script>
@@ -21,15 +22,12 @@
         fetch(csvUrl)
             .then(res => res.text())
             .then(data => {
-                const rows = data.split("\n");
-                // Az utolsó sor a legfrissebb adat a táblázatban
-                const latest = rows[rows.length - 1].split(",");
-                // A második oszlop (index 1) a százalék
-                document.getElementById('adat').innerText = latest[1] + "%";
-            })
-            .catch(err => {
-                console.error("Hiba:", err);
-                document.getElementById('adat').innerText = "Hiba!";
+                // A sorokat szétbontjuk és a legutolsót vesszük
+                const lines = data.trim().split("\n");
+                const lastLine = lines[lines.length - 1];
+                const cells = lastLine.split(",");
+                // A második oszlop (index 1)
+                document.getElementById('adat').innerText = cells[1] + "%";
             });
     </script>
 </body>
