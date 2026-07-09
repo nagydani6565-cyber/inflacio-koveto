@@ -1,68 +1,12 @@
-<!DOCTYPE html>
-<html lang="hu">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Infláció Érzékelő | Tapasztalatok</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #333; line-height: 1.6; }
-        .container { max-width: 800px; margin: auto; padding: 20px; }
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .number { font-size: 50px; font-weight: 800; color: #ff4757; text-align: center; }
-        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { background: #ff4757; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="card">
-            <h1>Aktuális infláció</h1>
-            <div id="adat" class="number">--%</div>
-            <p style="text-align:center">Ezt érzed te is a kasszánál?</p>
-        </div>
+const csvUrl = "IDE_TEDD_AZ_ÚJ_CSV_LINKET"; // Az output=csv végű link
 
-        <div class="card">
-            <h2>Inflációs tapasztalatok</h2>
-            <input type="text" id="nev" placeholder="Beceneved">
-            <textarea id="uzenet" placeholder="Mit tapasztaltál a boltban?"></textarea>
-            <button onclick="kuldes()">Küldés név nélkül</button>
-            <div id="kommentek"></div>
-        </div>
-    </div>
-
-    <!-- Firebase SDK és Logika -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-
-        // IDE MÁSOLD BE A SAJÁT FIREBASE CONFIG KÓDODAT
-        const firebaseConfig = { apiKey: "...", projectId: "...", ... };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // Adat betöltése Táblázatból
-        fetch("IDE_TEDD_A_CSV_LINKET").then(res => res.text()).then(data => {
-            const rows = data.split("\n");
-            const latest = rows[rows.length - 1].split(",");
-            document.getElementById('adat').innerText = latest[1] + "%";
-        });
-
-        // Kommentek kezelése
-        window.kuldes = async () => {
-            await addDoc(collection(db, "kommentek"), {
-                nev: document.getElementById('nev').value,
-                uzenet: document.getElementById('uzenet').value,
-                ido: new Date()
-            });
-        };
-
-        onSnapshot(query(collection(db, "kommentek"), orderBy("ido", "desc")), (snap) => {
-            let html = "";
-            snap.forEach(doc => {
-                html += `<p><strong>${doc.data().nev}:</strong> ${doc.data().uzenet}</p>`;
-            });
-            document.getElementById('kommentek').innerHTML = html;
-        });
-    </script>
-</body>
-</html>
+fetch(csvUrl)
+    .then(res => res.text())
+    .then(data => {
+        const rows = data.split("\n");
+        // A második sor (index 1) a legfrissebb adatod a táblázatban
+        const latest = rows[1].split(","); 
+        // feltételezve, hogy a dátum az 1. oszlop, infláció a 2.
+        document.getElementById('adat').innerText = latest[1] + "%";
+    })
+    .catch(err => console.log("Hiba az adatoknál:", err));
