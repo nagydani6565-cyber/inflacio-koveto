@@ -1,12 +1,36 @@
-const csvUrl = "IDE_TEDD_AZ_ÚJ_CSV_LINKET"; // Az output=csv végű link
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Infláció Érzékelő</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
+        .number { font-size: 48px; font-weight: bold; color: #ff4757; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Aktuális infláció</h1>
+        <div id="adat" class="number">Betöltés...</div>
+    </div>
 
-fetch(csvUrl)
-    .then(res => res.text())
-    .then(data => {
-        const rows = data.split("\n");
-        // A második sor (index 1) a legfrissebb adatod a táblázatban
-        const latest = rows[1].split(","); 
-        // feltételezve, hogy a dátum az 1. oszlop, infláció a 2.
-        document.getElementById('adat').innerText = latest[1] + "%";
-    })
-    .catch(err => console.log("Hiba az adatoknál:", err));
+    <script>
+        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vStI14U-qxq-UOxJrr-9Li2Sqh53RC00Dvw3PvLt12Bz3nzXTepuRKtHMFya3B5X4OpLfHScQqJOrnl/pub?output=csv";
+
+        fetch(csvUrl)
+            .then(res => res.text())
+            .then(data => {
+                const rows = data.split("\n");
+                // Az utolsó sor a legfrissebb adat a táblázatban
+                const latest = rows[rows.length - 1].split(",");
+                // A második oszlop (index 1) a százalék
+                document.getElementById('adat').innerText = latest[1] + "%";
+            })
+            .catch(err => {
+                console.error("Hiba:", err);
+                document.getElementById('adat').innerText = "Hiba!";
+            });
+    </script>
+</body>
+</html>
